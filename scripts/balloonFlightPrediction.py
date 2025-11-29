@@ -60,6 +60,7 @@ def main():
 		# descent_rate = 5.0
 		# use_current_time = False                              Calculates for 12:00am on current day
 
+	# Example usage with default values
 	data = fetch_prediction(
 		{"lat":54.66864, "lon":356.6498},
 		81.0,
