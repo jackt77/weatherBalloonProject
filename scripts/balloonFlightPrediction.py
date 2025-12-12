@@ -26,12 +26,10 @@ def fetch_prediction(
 	Returns:
 	     Prediction results as list[dict]
 	"""
-
 	if use_current_time:
 		launch_time = datetime.datetime.now()
 	else:
 		launch_time = datetime.datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
-
 	params = {
 		"profile": "standard_profile",
 		"pred_type": "single",
@@ -44,23 +42,22 @@ def fetch_prediction(
 		"descent_rate": descent_rate,
 		"format": "csv",
 	}
-
 	response = requests.get("https://api.v2.sondehub.org/tawhiri", params=params)
 	response.raise_for_status()
-
 	return list(csv.DictReader(StringIO(response.text)))
 
-def main():
+def save_prediction(prediction: list[dict]) -> None:
+	raise NotImplementedError()
+	# To add in excel handling later once fully complete.
 
+def main():
 	# Default values
 		# launch_position = {"lat":54.66864, "lon":356.6498}    Cockermouth school astro coordinates
 		# launch_altitude = 81.0                                Altitude on the astro
-		# ascent_rate = 5.0
+		# ascent_rate = 6.0
 		# burst_altitude = 35000                                Based on kaymont balloon's specs
-		# descent_rate = 5.0
+		# descent_rate = 6.0
 		# use_current_time = False                              Calculates for 12:00am on current day
-
-	# Example usage with default values
 	data = fetch_prediction(
 		{"lat":54.66864, "lon":356.6498},
 		81.0,
@@ -69,7 +66,7 @@ def main():
 		6.0,
 		False
 	)
-
+	save_prediction(data)
 
 if __name__ == "__main__":
 	main()
