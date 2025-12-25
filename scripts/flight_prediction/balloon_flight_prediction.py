@@ -24,7 +24,8 @@ def fetch_predictions(
 	"""
 	predictions = {}
 	for hour in [0, 6, 12, 18]:
-		launch_time = datetime.datetime.now().replace(hour=hour, minute=0, second=0, microsecond=0)
+		launch_time = datetime.datetime.now()
+		launch_time.replace(day=launch_time.day + 1, hour=hour, minute=0, second=0, microsecond=0)
 		params = {
 			"profile": "standard_profile",
 			"pred_type": "single",
@@ -37,9 +38,12 @@ def fetch_predictions(
 			"descent_rate": descent_rate,
 			"format": "csv",
 		}
-		response = requests.get("https://api.v2.sondehub.org/tawhiri", params=params)
-		response.raise_for_status()
-		predictions[hour] = list(csv.DictReader(StringIO(response.text)))
+		try:
+			response = requests.get("https://api.v2.sondehub.org/tawhiri", params=params)
+			response.raise_for_status()
+			predictions[hour] = list(csv.DictReader(StringIO(response.text)))
+		except Exception as ex:
+			print(ex)
 	return predictions
 
 def get_date_from_datetime(date_time: str) -> str:
@@ -56,7 +60,8 @@ from openpyxl.utils import get_column_letter
 
 def save_predictions_to_excel(predictions: dict[int, list[dict]]) -> None:
 	entry_number = 0
-	date: str = get_date_from_datetime(predictions[0][0]["datetime"])
+	first_entry: list[dict] = list(predictions.values())[0]
+	date: str = get_date_from_datetime(first_entry[0]["datetime"])
 	base_path = pathlib.Path(__file__).parent
 	file_path = base_path / "data.xlsx"
 	workbook = openpyxl.open(file_path)
@@ -87,7 +92,7 @@ def main():
 		# launch_position = {"lat":54.66864, "lon":356.6498}    Cockermouth school astro coordinates
 		# launch_altitude = 81.0                                Altitude on the astro
 		# ascent_rate = 6.0
-		# burst_altitude = 35000                                Based on kaymont balloon's specs
+		# burst_altitude = 35000                                Based on Kaymont balloon's specs
 		# descent_rate = 6.0
 	data = fetch_predictions(
 		{"lat":54.66864, "lon":356.6498},
