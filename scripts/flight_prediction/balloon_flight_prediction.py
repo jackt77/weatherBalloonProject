@@ -25,7 +25,7 @@ def fetch_predictions(
 	predictions = {}
 	for hour in [0, 6, 12, 18]:
 		launch_time = datetime.datetime.now()
-		launch_time.replace(day=launch_time.day + 1, hour=hour, minute=0, second=0, microsecond=0)
+		launch_time.replace(hour=hour, minute=0, second=0, microsecond=0)
 		params = {
 			"profile": "standard_profile",
 			"pred_type": "single",
@@ -68,7 +68,7 @@ def save_predictions_to_excel(predictions: dict[int, list[dict]]) -> None:
 	worksheet = workbook.create_sheet(title=f"{date}")
 	headers = ["time", "latitude", "longitude", "altitude"]
 	for hour, prediction in predictions.items():
-		offset: int = (7 * entry_number)
+		offset: int = (4 * entry_number)
 		for col, header in enumerate(headers, start=1):
 			worksheet.cell(row=1, column=offset + col).value = header
 		for row, entry in enumerate(prediction, start=2):
